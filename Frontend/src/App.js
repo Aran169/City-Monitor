@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from './AuthContext.js';
 import Header from "../src/Header/Header";
 import About from "../src/About/About"; // Import the About component
 import RegisterPage from "./Newregister/Newregister";
@@ -13,7 +12,6 @@ import Rural from "./Rural/Rural.jsx";
 
 function App() {
   return (
-    <AuthProvider>
     <Router>
       <Routes>
         <Route path='/' element={<Header />} />
@@ -28,7 +26,6 @@ function App() {
 
       </Routes>
     </Router>
-    </AuthProvider>
   );
 }
 

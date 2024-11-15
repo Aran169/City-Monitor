@@ -4,7 +4,7 @@ import axios from 'axios';
 import './LoginPage.css';
 import Navbar from '../Navbar/Navbar';
 
-const Login = () => {
+const LoginPage = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,7 +19,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/login', formData);
+      const response = await axios.post('https://city-monitor-3.onrender.com/login', formData);
       alert(response.data.message); // Display success message
       navigate('/');  // Redirect to the dashboard or home page on success
     } catch (error) {
@@ -73,4 +73,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;
