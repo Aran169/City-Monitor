@@ -78,7 +78,7 @@ function About() {
 
         <div className='learn-more'>
           <button>
-            <a  target='_blank' href='https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=smart+city+management&btnG=&oq=smart+city+manag'>
+            <a  target='_blank' href='https://scholar.google.com/scholar?hl=en&as_sdt=0%2C5&q=smart+city+management&btnG=&oq=smart+city+manag' rel="noreferrer">
               Learn More About Our Impact
             </a>
           </button>

@@ -99,23 +99,23 @@ const Dashboard = () => {
         <div className="card-container">
           <div className="card">
             <h3>Pollution Dashboard</h3>
-            <a target="_blank" href="https://public.tableau.com/views/PollutionDashboard_17311532311290/Pollution?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" className="analysis-link">Click here to analyze</a>
+            <a target="_blank"  href="https://public.tableau.com/views/PollutionDashboard_17311532311290/Pollution?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" rel="noreferrer" className="analysis-link">Click here to analyze</a>
           </div>
           <div className="card">
             <h3>Energy Dashboard</h3>
-            <a target="_blank" href="https://public.tableau.com/views/EnergyDashboard_17311559492640/Energy?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" className="analysis-link">Click here to analyze</a>
+            <a target="_blank" href="https://public.tableau.com/views/EnergyDashboard_17311559492640/Energy?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" rel="noreferrer" className="analysis-link">Click here to analyze</a>
           </div>
           <div className="card">
             <h3>Traffic Dashboard</h3>
-            <a target='_blank' href="https://public.tableau.com/views/TrafficDashboard_17311560362060/Traffic?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" className="analysis-link">Click here to analyze</a>
+            <a target='_blank' href="https://public.tableau.com/views/TrafficDashboard_17311560362060/Traffic?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" rel="noreferrer" className="analysis-link">Click here to analyze</a>
           </div>
           <div className="card">
             <h3>Smart City Dashboard</h3>
-            <a target='_blank' href="https://public.tableau.com/views/smartcityDashboard/smartcity?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" className="analysis-link">Click here to analyze</a>
+            <a target='_blank' href="https://public.tableau.com/views/smartcityDashboard/smartcity?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" rel="noreferrer" className="analysis-link">Click here to analyze</a>
           </div>
           <div className="card">
             <h3>IT Dashboard</h3>
-            <a target='_blank' href="https://public.tableau.com/views/ITDashboard_17311561420590/IT?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" className="analysis-link">Click here to analyze</a>
+            <a target='_blank' href="https://public.tableau.com/views/ITDashboard_17311561420590/IT?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" rel="noreferrer" className="analysis-link">Click here to analyze</a>
           </div>
         </div>
         <p>Click the button below to download the CSV sample data:</p>

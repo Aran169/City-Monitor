@@ -18,7 +18,7 @@ function Header() {
     }, 5000); // 5000ms = 5 seconds
 
     return () => clearInterval(interval); // Clean up the interval on unmount
-  }, []);
+  });
 
   return (
     <>
@@ -29,7 +29,7 @@ function Header() {
               CITY-MONITOR
             </a>
           </div>
-          <img src='/logo.png' alt='logo' />
+          <img src='/logo.png' alt='City Monitor Logo' /> {/* Updated alt */}
           <div className='right-container-navbar'>
             <Link to='/'>Home</Link>
             <Link to='/features'>Features</Link>
@@ -47,11 +47,11 @@ function Header() {
             <br /> Organized report of Smart Cities
           </h2>
           <Link to='/analysis'>
-          <button>Wanna Try</button>
+            <button>Wanna Try</button>
           </Link>
         </div>
         <div className='dec-img'>
-          <img src='img1.png' alt='img1' />
+          <img src='img1.png' alt='Decorative Illustration' /> {/* Updated alt */}
         </div>
 
         <div className='slogan1'>
@@ -63,13 +63,13 @@ function Header() {
           <div className='container1'>
             <div className='sub-container1'>
               <Link to='/urban'>
-                <img src='img1.png' alt='img1' className='hover-image1' />
+                <img src='img1.png' alt='Urban Area Illustration' className='hover-image1' /> {/* Updated alt */}
               </Link>
-              <span className='hover-text'>urban</span>
+              <span className='hover-text'>Urban</span>
             </div>
             <div className='sub-container2'>
               <Link to='/rural'>
-                <img src='img2.png' alt='img2' className='hover-image2' />
+                <img src='img2.png' alt='Rural Area Illustration' className='hover-image2' /> {/* Updated alt */}
               </Link>
               <span className='hover-text'>Rural</span>
             </div>
@@ -81,7 +81,7 @@ function Header() {
           <div className='display'>
             <img
               src={images[currentImage]}
-              alt={`Slideshow Image ${currentImage + 1}`}
+              alt={`Slide ${currentImage + 1}`} 
               className='slideshow-image'
             />
           </div>
