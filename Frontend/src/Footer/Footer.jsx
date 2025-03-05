@@ -38,9 +38,9 @@ function Footer() {
           <p>Address: Lovely Professional University, Phagwara, Punjab</p>
 
           <div className="footer-social">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><InstagramOutlined /></a>
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><FacebookOutlined /></a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><TwitterOutlined /></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"><InstagramOutlined /></a>
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"><FacebookOutlined /></a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"><TwitterOutlined /></a>
             <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"><LinkedinOutlined /></a>
           </div>
         </div>

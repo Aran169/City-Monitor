@@ -31,9 +31,17 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true
+    required: function() {
+      return !this.googleLogin; // Make password required only if not logging in via Google
+    },
+    default: "", // Set a default value in case the password is not set
+  },
+  googleLogin: {
+    type: Boolean,
+    default: false // Flag to indicate if the user logged in via Google
   }
 });
+
 
 const User = mongoose.model('User', userSchema);
 
@@ -47,6 +55,12 @@ app.post('/register', async (req, res) => {
   }
 
   try {
+    // Check if the email already exists
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -69,30 +83,70 @@ app.post('/register', async (req, res) => {
 
 // Login Route
 app.post('/login', async (req, res) => {
-    const {email, password } = req.body;
-  
-    try {
-      // Find user by email
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(400).json({ message: 'User not found' });
-      }
-  
-      // Compare password with the hashed password stored in the database
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ message: 'Invalid credentials' });
-      }
-  
-      // Send success response if login is successful
-      res.status(200).json({ message: 'Login successful' });
-      name: user.name
-    } catch (error) {
-      console.error('Error logging in:', error);
-      res.status(500).json({ message: 'Error logging in', error });
+  const { email, password } = req.body;
+
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'User not found' });
     }
-  });
-  
+
+    // Compare password with the hashed password stored in the database
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Send success response with user data
+    res.status(200).json({ 
+      message: 'Login successful', 
+      user: { fullName: user.fullName, email: user.email }  // Send user details
+    });
+
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ message: 'Error logging in', error });
+  }
+});
+
+// Google Login Route
+app.post('/google-login', async (req, res) => {
+  const { fullName, email } = req.body;
+
+  try {
+    console.log("Received Google login request:", req.body);  // Log the received data
+
+    // Check if user already exists in MongoDB
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      console.log("User not found. Creating new user...");
+      // If the user doesn't exist, create a new one
+      user = new User({
+        fullName,
+        email,
+        password: "", // For Google login, you may not have a password
+        googleLogin: true // Mark user as logged in via Google
+      });
+      await user.save();
+      console.log("New user created:", user);
+    } else {
+      console.log("User found in DB:", user);
+    }
+
+    // Send success response with user data
+    res.status(200).json({
+      message: 'Google login successful',
+      user: { fullName: user.displayName, email: user.email },
+    });
+  } catch (error) {
+    console.error('Error during Google login:', error);
+    res.status(500).json({ message: 'Error during Google login', error });
+  }
+});
+
+
 
 // Listen on a port
 const PORT = process.env.PORT || 5000;
