@@ -5,7 +5,6 @@ import { signOut } from "firebase/auth"; // Import signOut function
 import { Link } from 'react-router-dom';
 
 function Navbar() {
-  const [currentImage, setCurrentImage] = useState(0);
   const [user, setUser] = useState(null);
   const [showLogout, setShowLogout] = useState(false);
 
@@ -46,15 +45,6 @@ function Navbar() {
   const toggleLogout = () => {
     setShowLogout(!showLogout);
   };
-
-  const images = ["display1.jpg", "2img.jpg", "3img.jpg"];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentImage((prevImage) => (prevImage + 1) % images.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  });
 
   return (
     <div className='head1'>
