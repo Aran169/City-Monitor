@@ -7,7 +7,13 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(cors());
+
+app.use(cors({
+  origin: "*", // You can specify specific origins here, e.g., ['https://citymonitor.netlify.app']
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+}));
+
 app.use(bodyParser.json());
 
 // Connect to MongoDB

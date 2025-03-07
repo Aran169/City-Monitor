@@ -20,7 +20,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/register",
+        "https://city-monitor-3.onrender.com/register",
         formData
       );
       alert(response.data.message); // Display success message

@@ -1,28 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import "./Navbar.css";
+import { auth } from "../firebaseConfig"; // Import Firebase authentication
+import { signOut } from "firebase/auth"; // Import signOut function
 import { Link } from 'react-router-dom';
 
 function Navbar() {
+  const [currentImage, setCurrentImage] = useState(0);
   const [user, setUser] = useState(null);
-  const [showLogout, setShowLogout] = useState(false); // State for toggling logout visibility
+  const [showLogout, setShowLogout] = useState(false);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    // Get user from localStorage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
     }
+
+    // Firebase auth listener
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          fullName: firebaseUser.displayName, // Firebase stores name here
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL, // Profile picture
+        });
+        localStorage.setItem("user", JSON.stringify(firebaseUser)); // Save to localStorage
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user"); // Remove user data
-    setUser(null); // Update state
-    setShowLogout(false); // Hide the logout button after logging out
-    window.location.reload(); // Refresh to update Navbar
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out from Firebase
+      localStorage.removeItem("user");
+      setUser(null);
+      setShowLogout(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const toggleLogout = () => {
-    setShowLogout(!showLogout); // Toggle visibility of logout button
+    setShowLogout(!showLogout);
   };
+
+  const images = ["display1.jpg", "2img.jpg", "3img.jpg"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prevImage) => (prevImage + 1) % images.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  });
 
   return (
     <div className='head1'>
@@ -38,27 +70,24 @@ function Navbar() {
           <Link to="/about">About</Link>
 
           {user ? (
-            <div className="dropdown">
-              <span
-                className="username"
-                onClick={toggleLogout}
-              >
-                {user.fullName} {/* Display full name */}
-              </span>
-              {showLogout && (
-                <span
-                  onClick={handleLogout}
-                  className={`logout-text ${showLogout ? 'visible' : ''}`}
-                >
-                  Logout
-                </span>
-              )}
-            </div>
-          ) : (
-            <Link to='/login'>
-              <button>Login</button>
-            </Link>
-          )}
+                        <div className='dropdown'>
+                          <span className='username' onClick={toggleLogout}>
+                            {user.fullName || user.email} {/* Show fullName or email */}
+                          </span>
+                          {showLogout && (
+                            <span
+                              onClick={handleLogout}
+                              className={`logout-text ${showLogout ? "visible" : ""}`}
+                            >
+                              Logout
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <Link to='/login'>
+                          <button>Login</button>
+                        </Link>
+                      )}
         </div>
       </nav>
     </div>
