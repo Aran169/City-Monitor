@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-const User = require("./models/User"); // Adjust the path if needed
+const User = require("./models/user"); // Adjust the path if needed
 
 const app = express();
 
