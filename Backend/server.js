@@ -67,7 +67,6 @@ app.post("/register", async (req, res) => {
       fullName,
       email,
       password: hashedPassword,
-      isVerified: false, // Initially, the user is not verified
     });
 
     // Save the user to the database
@@ -149,7 +148,7 @@ app.post("/login", async (req, res) => {
     // Send success response with user data
     res.status(200).json({
       message: "Login successful",
-      user: { fullName: user.fullName, email: user.email }, // Send user details
+      user: { fullName: user.fullName, email: user.email, isVerified: user.isVerified }, // Send user details
     });
   } catch (error) {
     console.error("Error logging in:", error);

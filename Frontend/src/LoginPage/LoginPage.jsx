@@ -25,16 +25,18 @@ const LoginPage = () => {
         "https://city-monitor-3.onrender.com/login",
         formData
       );
+       console.log(response.data);
 
       if (response.data.user) {
         // Check if the user is verified before allowing login
-        if (!response.data.user.isVerified) {
+        if (response.data.user.isVerified) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+        } else {
           alert("Please verify your email before logging in.");
           return;
         }
 
         // Store complete user data including fullName in localStorage
-        localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
       alert(response.data.message);
