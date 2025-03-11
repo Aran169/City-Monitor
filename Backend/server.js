@@ -4,7 +4,6 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-const User = require("./models/user"); // Adjust the path if needed
 
 const app = express();
 
@@ -34,39 +33,7 @@ mongoose
 
 // User Schema
 const crypto = require("crypto");
-
-const userSchema = new mongoose.Schema({
-  fullName: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: function () {
-      return !this.googleLogin; // Make password required only if not logging in via Google
-    },
-    default: "", // Set a default value in case the password is not set
-  },
-  googleLogin: {
-    type: Boolean,
-    default: false, // Flag to indicate if the user logged in via Google
-  },
-  resetPasswordToken: {
-    type: String,
-    default: null, // Store the reset token
-  },
-  resetPasswordExpires: {
-    type: Date,
-    default: null, // Store token expiry time
-  },
-});
-
-module.exports = mongoose.model("User", userSchema);
+const User = require("./models/user"); // Adjust the path if needed
 
 // Registration Route
 app.post("/register", async (req, res) => {
