@@ -1,70 +1,86 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt');
-const cors = require('cors');
+const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
+const bcrypt = require("bcrypt");
+const cors = require("cors");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 const app = express();
 
 // Middleware
 
-app.use(cors({
-  origin: "*", // You can specify specific origins here, e.g., ['https://citymonitor.netlify.app']
-  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
-  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  })
+);
 
 app.use(bodyParser.json());
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://City-Monitor:citymonitor1234@city-monitor.04fdi.mongodb.net/City-Monitor', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('MongoDB connected'))
-  .catch(error => console.log('MongoDB connection error:', error));
+mongoose
+  .connect(
+    "mongodb+srv://City-Monitor:citymonitor1234@city-monitor.04fdi.mongodb.net/City-Monitor",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => console.log("MongoDB connected"))
+  .catch((error) => console.log("MongoDB connection error:", error));
 
 // User Schema
+
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: function() {
+    required: function () {
       return !this.googleLogin; // Make password required only if not logging in via Google
     },
     default: "", // Set a default value in case the password is not set
   },
   googleLogin: {
     type: Boolean,
-    default: false // Flag to indicate if the user logged in via Google
-  }
+    default: false, // Flag to indicate if the user logged in via Google
+  },
+  resetPasswordToken: {
+    type: String,
+    default: null, // Store the reset token
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null, // Store token expiry time
+  },
 });
 
-
-const User = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
 
 // Registration Route
-app.post('/register', async (req, res) => {
+app.post("/register", async (req, res) => {
   const { fullName, email, password, confirmPassword } = req.body;
 
   // Basic validation
   if (password !== confirmPassword) {
-    return res.status(400).json({ message: 'Passwords do not match' });
+    return res.status(400).json({ message: "Passwords do not match" });
   }
 
   try {
     // Check if the email already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     // Hash the password
@@ -74,54 +90,53 @@ app.post('/register', async (req, res) => {
     const newUser = new User({ fullName, email, password: hashedPassword });
     await newUser.save();
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ message: "User registered successfully" });
   } catch (error) {
     // Handle Mongoose validation errors
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
+    if (error.name === "ValidationError") {
+      const messages = Object.values(error.errors).map((val) => val.message);
       return res.status(400).json({ message: messages[0] });
     } else {
-      console.error('Error registering user:', error);
-      res.status(500).json({ message: 'Error registering user', error });
+      console.error("Error registering user:", error);
+      res.status(500).json({ message: "Error registering user", error });
     }
   }
 });
 
 // Login Route
-app.post('/login', async (req, res) => {
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   try {
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'User not found' });
+      return res.status(400).json({ message: "User not found" });
     }
 
     // Compare password with the hashed password stored in the database
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     // Send success response with user data
-    res.status(200).json({ 
-      message: 'Login successful', 
-      user: { fullName: user.fullName, email: user.email }  // Send user details
+    res.status(200).json({
+      message: "Login successful",
+      user: { fullName: user.fullName, email: user.email }, // Send user details
     });
-
   } catch (error) {
-    console.error('Error logging in:', error);
-    res.status(500).json({ message: 'Error logging in', error });
+    console.error("Error logging in:", error);
+    res.status(500).json({ message: "Error logging in", error });
   }
 });
 
 // Google Login Route
-app.post('/google-login', async (req, res) => {
+app.post("/google-login", async (req, res) => {
   const { fullName, email } = req.body;
 
   try {
-    console.log("Received Google login request:", req.body);  // Log the received data
+    console.log("Received Google login request:", req.body); // Log the received data
 
     // Check if user already exists in MongoDB
     let user = await User.findOne({ email });
@@ -133,7 +148,7 @@ app.post('/google-login', async (req, res) => {
         fullName,
         email,
         password: "", // For Google login, you may not have a password
-        googleLogin: true // Mark user as logged in via Google
+        googleLogin: true, // Mark user as logged in via Google
       });
       await user.save();
       console.log("New user created:", user);
@@ -143,16 +158,85 @@ app.post('/google-login', async (req, res) => {
 
     // Send success response with user data
     res.status(200).json({
-      message: 'Google login successful',
+      message: "Google login successful",
       user: { fullName: user.displayName, email: user.email },
     });
   } catch (error) {
-    console.error('Error during Google login:', error);
-    res.status(500).json({ message: 'Error during Google login', error });
+    console.error("Error during Google login:", error);
+    res.status(500).json({ message: "Error during Google login", error });
   }
 });
 
+app.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
 
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Generate reset token
+    const token = crypto.randomBytes(32).toString("hex");
+
+    // Store token in DB with 1-hour expiry
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+    await user.save();
+
+    // Send reset email
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "muruganarul1693@gmail.com",
+        pass: "I will fill this", // Use an app password
+      },
+    });
+
+    const resetLink = `https://citymonitor.netlify.app/reset-password/${token}`;
+
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Password Reset Request",
+      text: `Click this link to reset your password: ${resetLink}`,
+    });
+
+    res.status(200).json({ message: "Password reset email sent." });
+  } catch (error) {
+    console.error("Error in forgot password:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+app.post("/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }, // Ensure token is still valid
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user password
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.status(200).json({ message: "Password successfully reset" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Listen on a port
 const PORT = process.env.PORT || 5000;

@@ -9,6 +9,8 @@ import Urban from './Urban/Urban.jsx';
 import Analysis from "./Analysis/Analysis";
 import FeedbackForm from "./Feedback/Feedback";
 import Rural from "./Rural/Rural.jsx";
+import ForgotPassword from "./Forgetpass/Forgetpass";
+import ResetPassword from "./Resetpass/Resetpass";
 
 function App() {
   return (
@@ -23,7 +25,8 @@ function App() {
         <Route path='/urban' element={<Urban />} />
         <Route path='/feedback' element={<FeedbackForm />} />
         <Route path='/rural' element={<Rural />} />
-
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>
     </Router>
   );
