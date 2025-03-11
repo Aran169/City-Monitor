@@ -7,9 +7,11 @@ const cors = require("cors");
 const nodemailer = require("nodemailer");
 const router = express.Router();
 const app = express();
+require("dotenv").config();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware
-const JWT_SECRET = "your_secret_key";
 app.use(
   cors({
     origin: "*", // You can specify specific origins here, e.g., ['https://citymonitor.netlify.app']
@@ -35,6 +37,14 @@ mongoose
 // User Schema
 const crypto = require("crypto");
 const User = require("./models/user"); // Adjust the path if needed
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 // Registration Route
 router.post("/register", async (req, res) => {
@@ -164,13 +174,7 @@ app.post("/forgot-password", async (req, res) => {
     await user.save();
 
     // Send email with reset link
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    
 
     const resetLink = `https://citymonitor.netlify.app/reset-password/${resetToken}`;
     const mailOptions = {
