@@ -25,7 +25,7 @@ const LoginPage = () => {
         "https://city-monitor-3.onrender.com/login",
         formData
       );
-       console.log(response.data);
+      console.log(response.data);
 
       if (response.data.user) {
         // Check if the user is verified before allowing login
@@ -72,6 +72,7 @@ const LoginPage = () => {
       // Redirect to home page
       window.location.href = "/";
     } catch (error) {
+      window.location.href = "/";
       console.error("Google Login Error:", error);
       setError("Google login failed. Please try again.");
     }
