@@ -1,14 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-
+const router = express.Router();
 const app = express();
 
 // Middleware
-
+const JWT_SECRET = "your_secret_key";
 app.use(
   cors({
     origin: "*", // You can specify specific origins here, e.g., ['https://citymonitor.netlify.app']
@@ -36,40 +37,51 @@ const crypto = require("crypto");
 const User = require("./models/user"); // Adjust the path if needed
 
 // Registration Route
-app.post("/register", async (req, res) => {
-  const { fullName, email, password, confirmPassword } = req.body;
-
-  // Basic validation
-  if (password !== confirmPassword) {
-    return res.status(400).json({ message: "Passwords do not match" });
-  }
+router.post("/register", async (req, res) => {
+  const { fullName, email, password } = req.body;
 
   try {
-    // Check if the email already exists
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
-    }
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ message: "Email already exists" });
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    user = new User({ fullName, email, password: hashedPassword, isVerified: false });
 
-    // Create and save the user
-    const newUser = new User({ fullName, email, password: hashedPassword });
-    await newUser.save();
+    await user.save();
 
-    res.status(201).json({ message: "User registered successfully" });
+    // Generate verification token
+    const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+
+    // Send verification email
+    const verificationLink = `https://citymonitor.netlify.app/verify-email/${token}`;
+    await transporter.sendMail({
+      from: '"City Monitor" muruganarul1693@gmail.com',
+      to: email,
+      subject: "Verify Your Email",
+      html: `<p>Click <a href="${verificationLink}">here</a> to verify your email.</p>`,
+    });
+
+    res.json({ message: "Registration successful! Please check your email for verification." });
   } catch (error) {
-    // Handle Mongoose validation errors
-    if (error.name === "ValidationError") {
-      const messages = Object.values(error.errors).map((val) => val.message);
-      return res.status(400).json({ message: messages[0] });
-    } else {
-      console.error("Error registering user:", error);
-      res.status(500).json({ message: "Error registering user", error });
-    }
+    res.status(500).json({ message: "Server error", error });
   }
 });
+
+router.get("/verify-email/:token", async (req, res) => {
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findOneAndUpdate({ email: decoded.email }, { isVerified: true });
+
+    if (!user) return res.status(400).json({ message: "Invalid token" });
+
+    res.json({ message: "Email verification successful!" });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid or expired token" });
+  }
+});
+
+module.exports = router;
 
 // Login Route
 app.post("/login", async (req, res) => {
@@ -155,8 +167,8 @@ app.post("/forgot-password", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "muruganarul1693@gmail.com",
-        pass: "cbjp amzn ayiw tddz",
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 

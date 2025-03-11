@@ -27,6 +27,12 @@ const LoginPage = () => {
       );
 
       if (response.data.user) {
+        // Check if the user is verified before allowing login
+        if (!response.data.user.isVerified) {
+          alert("Please verify your email before logging in.");
+          return;
+        }
+
         // Store complete user data including fullName in localStorage
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
@@ -53,7 +59,10 @@ const LoginPage = () => {
       };
 
       // Send Google user data to the backend to store in MongoDB
-      await axios.post("https://city-monitor-3.onrender.com/google-login", userData);
+      await axios.post(
+        "https://city-monitor-3.onrender.com/google-login",
+        userData
+      );
 
       // Save Google login user data in localStorage
       localStorage.setItem("user", JSON.stringify(userData));

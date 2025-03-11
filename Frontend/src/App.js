@@ -11,6 +11,7 @@ import FeedbackForm from "./Feedback/Feedback";
 import Rural from "./Rural/Rural.jsx";
 import ForgotPassword from "./Forgetpass/Forgetpass";
 import ResetPassword from "./Resetpass/Resetpass";
+import VerifyEmail from "./Verifyemail/Verifyemail";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
         <Route path='/rural' element={<Rural />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
+
       </Routes>
     </Router>
   );
