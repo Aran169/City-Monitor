@@ -37,32 +37,32 @@ const crypto = require("crypto");
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
-    required: true
+    required: true,
   },
   email: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
   },
   password: {
     type: String,
-    required: function() {
+    required: function () {
       return !this.googleLogin; // Make password required only if not logging in via Google
     },
-    default: "" // Set a default value in case the password is not set
+    default: "", // Set a default value in case the password is not set
   },
   googleLogin: {
     type: Boolean,
-    default: false // Flag to indicate if the user logged in via Google
+    default: false, // Flag to indicate if the user logged in via Google
   },
   resetPasswordToken: {
     type: String,
-    default: null // Store the reset token
+    default: null, // Store the reset token
   },
   resetPasswordExpires: {
     type: Date,
-    default: null // Store token expiry time
-  }
+    default: null, // Store token expiry time
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
@@ -167,7 +167,6 @@ app.post("/google-login", async (req, res) => {
   }
 });
 
-
 // Forgot Password Route
 app.post("/forgot-password", async (req, res) => {
   const { email } = req.body;
@@ -188,16 +187,16 @@ app.post("/forgot-password", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "your-email@gmail.com", // 🔹 Replace with your email
-        pass: "your-email-password" // 🔹 Replace with your app password
-      }
+        user: "muruganarul1693@gmail.com",
+        pass: "cbjp amzn ayiw tddz",
+      },
     });
 
     const resetLink = `https://citymonitor.netlify.app/reset-password/${resetToken}`;
     const mailOptions = {
       to: user.email,
       subject: "Password Reset Request",
-      text: `Click the link to reset your password: ${resetLink}`
+      text: `Click the link to reset your password: ${resetLink}`,
     };
 
     await transporter.sendMail(mailOptions);
@@ -208,7 +207,6 @@ app.post("/forgot-password", async (req, res) => {
   }
 });
 
-
 app.post("/reset-password/:token", async (req, res) => {
   const { token } = req.params;
   const { newPassword } = req.body;
@@ -216,7 +214,7 @@ app.post("/reset-password/:token", async (req, res) => {
   try {
     const user = await User.findOne({
       resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() } // Check if token is valid
+      resetPasswordExpires: { $gt: Date.now() }, // Check if token is valid
     });
 
     if (!user) {
@@ -236,7 +234,6 @@ app.post("/reset-password/:token", async (req, res) => {
     res.status(500).json({ message: "Error resetting password" });
   }
 });
-
 
 // Listen on a port
 const PORT = process.env.PORT || 5000;
