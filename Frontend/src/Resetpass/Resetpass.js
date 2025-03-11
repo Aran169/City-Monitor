@@ -16,8 +16,9 @@ const ResetPassword = () => {
       );
       setMessage(response.data.message);
     } catch (error) {
-      setMessage("Error resetting password.");
-    }
+        setMessage(error.response?.data?.message || "Error sending reset email.");
+      }
+      
   };
 
   return (
