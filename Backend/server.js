@@ -135,6 +135,11 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
+    if (!user.isVerified) {
+      return res.status(400).json({ message: "Please verify your email first." });
+    }
+
+
     // Compare password with the hashed password stored in the database
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {

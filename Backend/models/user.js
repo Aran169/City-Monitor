@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  isVerified: {
+    type: Boolean,
+    default: false, // Default value is false when user registers
+  },
   resetPasswordToken: {
     type: String,
     default: null,
