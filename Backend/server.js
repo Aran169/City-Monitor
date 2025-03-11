@@ -19,6 +19,7 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   })
 );
+app.use("/api", router); // This mounts all routes under "/api"
 
 app.use(bodyParser.json());
 
@@ -47,22 +48,35 @@ const transporter = nodemailer.createTransport({
 });
 
 // Registration Route
-router.post("/register", async (req, res) => {
+// Registration Route using app.post
+app.post("/register", async (req, res) => {
   const { fullName, email, password } = req.body;
 
   try {
+    // Check if the user already exists
     let user = await User.findOne({ email });
-    if (user) return res.status(400).json({ message: "Email already exists" });
+    if (user) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
 
+    // Hash the password before saving to the database
     const hashedPassword = await bcrypt.hash(password, 10);
-    user = new User({ fullName, email, password: hashedPassword, isVerified: false });
 
+    // Create a new user
+    user = new User({
+      fullName,
+      email,
+      password: hashedPassword,
+      isVerified: false, // Initially, the user is not verified
+    });
+
+    // Save the user to the database
     await user.save();
 
-    // Generate verification token
+    // Generate a verification token
     const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
 
-    // Send verification email
+    // Send verification email with the verification link
     const verificationLink = `https://citymonitor.netlify.app/verify-email/${token}`;
     await transporter.sendMail({
       from: '"City Monitor" muruganarul1693@gmail.com',
@@ -71,27 +85,44 @@ router.post("/register", async (req, res) => {
       html: `<p>Click <a href="${verificationLink}">here</a> to verify your email.</p>`,
     });
 
-    res.json({ message: "Registration successful! Please check your email for verification." });
+    // Respond with a success message
+    res.json({
+      message: "Registration successful! Please check your email for verification.",
+    });
   } catch (error) {
+    console.error("Error during registration:", error);
     res.status(500).json({ message: "Server error", error });
   }
 });
 
-router.get("/verify-email/:token", async (req, res) => {
+
+// Email Verification Route using app.get
+app.get("/verify-email/:token", async (req, res) => {
   try {
     const { token } = req.params;
+    // Decode the token to get the email
     const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findOneAndUpdate({ email: decoded.email }, { isVerified: true });
 
-    if (!user) return res.status(400).json({ message: "Invalid token" });
+    // Find the user by email and update the `isVerified` field
+    const user = await User.findOneAndUpdate(
+      { email: decoded.email },
+      { isVerified: true },
+      { new: true } // This option ensures the updated document is returned
+    );
+
+    if (!user) {
+      return res.status(400).json({ message: "User not found or already verified" });
+    }
 
     res.json({ message: "Email verification successful!" });
   } catch (error) {
+    // Handle specific error cases for token verification
+    if (error.name === "TokenExpiredError") {
+      return res.status(400).json({ message: "Token has expired. Please request a new verification email." });
+    }
     res.status(400).json({ message: "Invalid or expired token" });
   }
 });
-
-module.exports = router;
 
 // Login Route
 app.post("/login", async (req, res) => {
