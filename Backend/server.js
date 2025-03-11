@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const cors = require("cors");
+const nodemailer = require("nodemailer");
 
 const app = express();
 
@@ -31,30 +32,40 @@ mongoose
   .catch((error) => console.log("MongoDB connection error:", error));
 
 // User Schema
+const crypto = require("crypto");
+
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
-    required: true,
+    required: true
   },
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   password: {
     type: String,
-    required: function () {
+    required: function() {
       return !this.googleLogin; // Make password required only if not logging in via Google
     },
-    default: "", // Set a default value in case the password is not set
+    default: "" // Set a default value in case the password is not set
   },
   googleLogin: {
     type: Boolean,
-    default: false, // Flag to indicate if the user logged in via Google
+    default: false // Flag to indicate if the user logged in via Google
   },
+  resetPasswordToken: {
+    type: String,
+    default: null // Store the reset token
+  },
+  resetPasswordExpires: {
+    type: Date,
+    default: null // Store token expiry time
+  }
 });
 
-const User = mongoose.model("User", userSchema);
+module.exports = mongoose.model("User", userSchema);
 
 // Registration Route
 app.post("/register", async (req, res) => {
@@ -155,6 +166,77 @@ app.post("/google-login", async (req, res) => {
     res.status(500).json({ message: "Error during Google login", error });
   }
 });
+
+
+// Forgot Password Route
+app.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "User not found" });
+    }
+
+    // Generate a reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // Token valid for 1 hour
+    await user.save();
+
+    // Send email with reset link
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your-email@gmail.com", // 🔹 Replace with your email
+        pass: "your-email-password" // 🔹 Replace with your app password
+      }
+    });
+
+    const resetLink = `https://citymonitor.netlify.app/reset-password/${resetToken}`;
+    const mailOptions = {
+      to: user.email,
+      subject: "Password Reset Request",
+      text: `Click the link to reset your password: ${resetLink}`
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "Reset email sent!" });
+  } catch (error) {
+    console.error("Error sending reset email:", error);
+    res.status(500).json({ message: "Error sending reset email" });
+  }
+});
+
+
+app.post("/reset-password/:token", async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() } // Check if token is valid
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+    await user.save();
+
+    res.json({ message: "Password updated successfully!" });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({ message: "Error resetting password" });
+  }
+});
+
 
 // Listen on a port
 const PORT = process.env.PORT || 5000;
