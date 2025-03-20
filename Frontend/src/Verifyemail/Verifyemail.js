@@ -6,10 +6,11 @@ const VerifyEmail = () => {
   const { token } = useParams();
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
-
+  const renderLink = process.env.REACT_APP_RENDER_LINK;
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     axios
-      .get(`https://city-monitor-3.onrender.com/verify-email/${token}`)
+      .get(`${renderLink}/verify-email/${token}`)
       .then((response) => {
         setMessage(response.data.message);
         setTimeout(() => navigate("/login"), 3000);
@@ -17,10 +18,11 @@ const VerifyEmail = () => {
       .catch((error) => {
         setMessage("Invalid or expired token.");
       });
-  }, [token, navigate]);
+  }, [token, navigate]); // No need to add renderLink here
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return (
-    <div className="verify-container">
+    <div className='verify-container'>
       <h2>{message}</h2>
     </div>
   );

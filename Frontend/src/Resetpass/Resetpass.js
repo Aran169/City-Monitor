@@ -6,12 +6,13 @@ const ResetPassword = () => {
   const { token } = useParams(); // Get token from URL
   const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
+  const renderLink = process.env.REACT_APP_RENDER_LINK; 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `https://city-monitor-3.onrender.com/reset-password/${token}`,
+        `${renderLink}/reset-password/${token}`,
         { newPassword }
       );
       setMessage(response.data.message);

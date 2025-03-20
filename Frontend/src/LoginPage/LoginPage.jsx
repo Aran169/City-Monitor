@@ -17,12 +17,12 @@ const LoginPage = () => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  const renderLink = process.env.REACT_APP_RENDER_LINK; 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://city-monitor-3.onrender.com/login",
+        `${renderLink}/login`,
         formData
       );
       console.log(response.data);
@@ -62,7 +62,7 @@ const LoginPage = () => {
 
       // Send Google user data to the backend to store in MongoDB
       await axios.post(
-        "https://city-monitor-3.onrender.com/google-login",
+        `${renderLink}/google-login`,
         userData
       );
 

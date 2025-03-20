@@ -10,6 +10,7 @@ const RegisterPage = () => {
     password: "",
     confirmPassword: "",
   });
+  const renderLink = process.env.REACT_APP_RENDER_LINK; 
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,7 +21,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "https://city-monitor-3.onrender.com/register",
+        `${renderLink}/register`,
         formData
       );
       alert(response.data.message); // Display success message
