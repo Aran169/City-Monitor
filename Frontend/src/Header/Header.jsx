@@ -100,7 +100,7 @@ function Header() {
 
         <div className='header-text'>
           <h2>Analysed, Summarised and Organized report of Smart Cities</h2>
-          <Link to='/analysis'>
+          <Link to={user ? "/analysis" : "/login-required"}>
             <button>Wanna Try</button>
           </Link>
         </div>
