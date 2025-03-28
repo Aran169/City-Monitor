@@ -26,7 +26,7 @@ function Footer() {
         <div className='footer-column footer-links'>
           <Link to='/'>Home</Link>
           <Link to='/features'>Features</Link>
-          <Link to='/analysis'>Analysis</Link>
+          <Link to={user ? "/analysis" : "/login-required"}>Analysis</Link>
           <Link to='/about'>About</Link>
         </div>
 
