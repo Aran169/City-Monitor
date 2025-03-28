@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { auth } from "../firebaseConfig"; // Import Firebase authentication
 import { signOut } from "firebase/auth"; // Import signOut function
 import "./Header.css";
@@ -57,6 +57,9 @@ function Header() {
     return () => clearInterval(interval);
   });
 
+
+ 
+
   return (
     <>
       <div className='header'>
@@ -70,7 +73,7 @@ function Header() {
           <div className='right-container-navbar'>
             <Link to='/'>Home</Link>
             <Link to='/features'>Features</Link>
-            <Link to='/analysis'>Analysis</Link>
+            <Link to={user ? "/analysis" : "/login-required"}>Analysis</Link>
             <Link to='/about'>About</Link>
 
             {user ? (
