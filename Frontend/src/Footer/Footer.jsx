@@ -1,9 +1,34 @@
-import React from "react";
+import React, { useState, useEffect }from "react";
 import { InstagramOutlined ,FacebookOutlined,TwitterOutlined,LinkedinOutlined} from '@ant-design/icons';
 import { Link } from "react-router-dom";
+import { auth } from "../firebaseConfig"; // Import Firebase authentication
+
 import "./Footer.css";
 
 function Footer() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Get user from localStorage
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser) {
+      setUser(storedUser);
+    }
+
+    // Firebase auth listener
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      if (firebaseUser) {
+        setUser({
+          fullName: firebaseUser.displayName, // Firebase stores name here
+          email: firebaseUser.email,
+          photoURL: firebaseUser.photoURL, // Profile picture
+        });
+        localStorage.setItem("user", JSON.stringify(firebaseUser)); // Save to localStorage
+      }
+    });
+
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
   return (
     <footer className='footer'>
       <div className='footer-content'>
