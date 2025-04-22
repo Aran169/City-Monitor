@@ -22,7 +22,7 @@ const LoginPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${renderLink}/login`,
+        `${renderLink}/api/login`,
         formData
       );
       console.log(response.data);
@@ -62,7 +62,7 @@ const LoginPage = () => {
 
       // Send Google user data to the backend to store in MongoDB
       await axios.post(
-        `${renderLink}/google-login`,
+        `${renderLink}/api/google-login`,
         userData
       );
 

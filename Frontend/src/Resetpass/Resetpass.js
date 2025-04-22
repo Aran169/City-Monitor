@@ -12,7 +12,7 @@ const ResetPassword = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${renderLink}/reset-password/${token}`,
+        `${renderLink}/api/reset-password/${token}`,
         { newPassword }
       );
       setMessage(response.data.message);

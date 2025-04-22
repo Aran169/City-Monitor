@@ -9,7 +9,7 @@ const ForgotPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${renderLink}/forgot-password`, {
+      const response = await axios.post(`${renderLink}/api/forgot-password`, {
         email,
       });
       setMessage(response.data.message);
