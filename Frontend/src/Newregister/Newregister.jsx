@@ -21,7 +21,7 @@ const RegisterPage = () => {
     e.preventDefault();
     try {
       const response = await axios.post(
-        `${renderLink}/register`,
+        `${renderLink}/api/register`,
         formData
       );
       alert(response.data.message); // Display success message
