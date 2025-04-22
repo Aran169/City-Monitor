@@ -10,7 +10,7 @@ const VerifyEmail = () => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     axios
-      .get(`${renderLink}/verify-email/${token}`)
+      .get(`${renderLink}/api/verify-email/${token}`)
       .then((response) => {
         setMessage(response.data.message);
         setTimeout(() => navigate("/login"), 3000);
