@@ -20,3 +20,8 @@ app.use('/api', authRoutes);
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+//simple text in interface
+app.get("/", (req, res) => {
+  res.send("Welcome to the backend server!");
+});
