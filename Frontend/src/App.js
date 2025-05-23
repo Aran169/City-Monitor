@@ -13,6 +13,9 @@ import ForgotPassword from "./Forgetpass/Forgetpass";
 import ResetPassword from "./Resetpass/Resetpass";
 import VerifyEmail from "./Verifyemail/Verifyemail";
 import LoginRequired from "./LoginRequired/LoginRequired";
+import AdminDashboard from "./admin/adminDashboard.jsx";
+import AdminLogin from "./admin/AdminLogin.jsx";
+import { Navigate } from 'react-router-dom';
 
 function App() {
   return (
@@ -31,6 +34,17 @@ function App() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/login-required" element={<LoginRequired />} />
+        <Route
+  path="/admin"
+  element={
+    localStorage.getItem('isAdmin') ? (
+      <AdminDashboard />
+    ) : (
+      <Navigate to="/admin-login" replace />
+    )
+  }
+/>
+        <Route path="/admin-login" element={<AdminLogin />} />
 
       </Routes>
     </Router>

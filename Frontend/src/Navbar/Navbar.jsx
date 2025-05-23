@@ -58,6 +58,7 @@ function Navbar() {
           <Link to="/features">Features</Link>
           <Link to={user ? "/analysis" : "/login-required"}>Analysis</Link>
           <Link to="/about">About</Link>
+          <Link to="/admin-login" className="nav-link">Admin Login</Link>
 
           {user ? (
                         <div className='dropdown'>
