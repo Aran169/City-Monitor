@@ -44,7 +44,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
   return (
     <div className="p-4">
