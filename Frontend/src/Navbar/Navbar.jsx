@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "./Navbar.css";
 import { auth } from "../firebaseConfig"; // Import Firebase authentication
 import { signOut } from "firebase/auth"; // Import signOut function
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const [user, setUser] = useState(null);
@@ -50,35 +50,37 @@ function Navbar() {
     <div className='head1'>
       <nav>
         <div className='logo-container'>
-          <a className='logo' href='/'>CITY-MONITOR</a>
+          <a className='logo' href='/'>
+            CITY-MONITOR
+          </a>
         </div>
         <img src='/logo.png' alt='logo' />
         <div className='right-container-navbar'>
-          <Link to="/">Home</Link>
-          <Link to="/features">Features</Link>
+          <Link to='/'>Home</Link>
+          <Link to='/features'>Features</Link>
           <Link to={user ? "/analysis" : "/login-required"}>Analysis</Link>
-          <Link to="/about">About</Link>
-          <Link to="/admin-login" className="nav-link">Admin Login</Link>
+          <Link to='/about'>About</Link>
+          {/* <Link to="/admin-login" className="nav-link">Admin Login</Link> */}
 
           {user ? (
-                        <div className='dropdown'>
-                          <span className='username' onClick={toggleLogout}>
-                            {user.fullName || user.email} {/* Show fullName or email */}
-                          </span>
-                          {showLogout && (
-                            <span
-                              onClick={handleLogout}
-                              className={`logout-text ${showLogout ? "visible" : ""}`}
-                            >
-                              Logout
-                            </span>
-                          )}
-                        </div>
-                      ) : (
-                        <Link to='/login'>
-                          <button>Login</button>
-                        </Link>
-                      )}
+            <div className='dropdown'>
+              <span className='username' onClick={toggleLogout}>
+                {user.fullName || user.email} {/* Show fullName or email */}
+              </span>
+              {showLogout && (
+                <span
+                  onClick={handleLogout}
+                  className={`logout-text ${showLogout ? "visible" : ""}`}
+                >
+                  Logout
+                </span>
+              )}
+            </div>
+          ) : (
+            <Link to='/login'>
+              <button>Login</button>
+            </Link>
+          )}
         </div>
       </nav>
     </div>

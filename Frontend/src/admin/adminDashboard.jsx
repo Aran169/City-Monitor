@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { getAuth } from 'firebase/auth'; // Firebase Auth SDK
+import { getAuth } from 'firebase/auth';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +12,8 @@ const AdminDashboard = () => {
     return await user.getIdToken();
   };
 
-  const fetchUsers = async () => {
+  // Wrap fetchUsers in useCallback to memoize it and avoid eslint warning
+  const fetchUsers = useCallback(async () => {
     const token = await getToken();
     if (!token) return;
 
@@ -20,7 +21,7 @@ const AdminDashboard = () => {
       headers: { Authorization: `Bearer ${token}` },
     });
     setUsers(res.data);
-  };
+  }, [auth]);  // dependencies: auth (or leave empty if auth never changes)
 
   const handleBlockToggle = async (id) => {
     const token = await getToken();
@@ -42,6 +43,7 @@ const AdminDashboard = () => {
     fetchUsers(); // refresh
   };
 
+  // Now add fetchUsers as dependency in useEffect
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
